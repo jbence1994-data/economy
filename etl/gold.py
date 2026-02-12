@@ -1,7 +1,7 @@
 from os import environ as env
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import min, max
+from pyspark.sql.functions import round, avg, min, max
 
 
 def gold_etl():
@@ -20,12 +20,14 @@ def gold_etl():
 
     inflation_gold_data_frame = inflation_gold_data_frame.groupBy("year").agg(
         min("value").alias("min_inflation"),
-        max("value").alias("max_inflation")
+        max("value").alias("max_inflation"),
+        round(avg("value"), 1).alias("avg_inflation")
     ).orderBy("year")
 
     interest_rate_gold_data_frame = interest_rate_gold_data_frame.groupBy("year").agg(
         min("value").alias("min_interest_rate"),
-        max("value").alias("max_interest_rate")
+        max("value").alias("max_interest_rate"),
+        round(avg("value"), 1).alias("avg_interest_rate")
     ).orderBy("year")
 
     (inflation_gold_data_frame
