@@ -1,6 +1,7 @@
 from os import environ as env
 
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession, Window
+from pyspark.sql.functions import col, lag
 
 
 def silver_etl():
@@ -16,6 +17,16 @@ def silver_etl():
     interest_rate_silver_data_frame = (spark
                                        .read
                                        .parquet(env.get("INTEREST_RATE_MEDALLION_BRONZE")))
+
+    inflation_silver_data_frame = (inflation_silver_data_frame.withColumn(
+        colName="change",
+        col=col("value") - lag("value").over(Window.orderBy("year", "month"))
+    ))
+
+    interest_rate_silver_data_frame = (interest_rate_silver_data_frame.withColumn(
+        colName="change",
+        col=col("value") - lag("value").over(Window.orderBy("year", "month", "day"))
+    ))
 
     (inflation_silver_data_frame
      .write
