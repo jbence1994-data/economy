@@ -24,11 +24,10 @@ def gold_etl():
         round(avg("value"), 1).alias("avg_inflation")
     ).orderBy("year")
 
-    interest_rate_gold_data_frame = interest_rate_gold_data_frame.groupBy("year").agg(
+    interest_rate_gold_data_frame = interest_rate_gold_data_frame.agg(
         min("value").alias("min_interest_rate"),
         max("value").alias("max_interest_rate"),
-        round(avg("value"), 1).alias("avg_interest_rate")
-    ).orderBy("year")
+    )
 
     (inflation_gold_data_frame
      .write
